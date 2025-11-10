@@ -1,11 +1,9 @@
 import Hero from "./_components/hero";
- 
-export default function Home() {
-  return (
-    <main className="space-y-32 pt-16">
-      {/* <p>ヒーローセクション</p> */}
-      <Hero />
-      <p>ギャラリー一覧</p>
-    </main>
-  );
+import { PROJECTS } from "@/app/_data/contents";
+import { fetchRepoData } from "@/app/utils/api";
+
+export default async function Home() {
+  const res = await fetchRepoData(PROJECTS[0].repoUrl);
+  console.log(res);
+  return <div>Hello</div>;
 }
