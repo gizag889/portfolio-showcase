@@ -1,12 +1,15 @@
 "use client";
- 
-import { Badge } from "@/app/components/ui/badge";
-import { Card, CardDescription, CardTitle } from "@/app/components/ui/card";
+
+import { Card } from "@/app/components/ui/card";
+import { CardTitle } from "@/app/components/ui/card";
+import { CardDescription } from "@/app/components/ui/card";
+import { Badge } from "lucide-react";
+import { Button } from "@/app/components/ui/button";
 import { MoveRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/app/components/ui/button";
 import { useState } from "react";
+import GalleryTopics from "./gallery-topics";
  
 type GalleryProps = {
   projects: {
@@ -15,28 +18,47 @@ type GalleryProps = {
     repoName: string;
     topics: string[];
     imageURL: string;
-    index: number;
   }[];
 };
  
 const Gallery = (props: GalleryProps) => {
-  const [latestProject, setLatestProject] = useState(props.projects[0]); 
-  const [selectedTopic, setSelectedTopic] = useState<string>("All");
 
-   const filteredProjects =
-     selectedTopic === "All"
-       ? props.projects.slice(1)
-       : props.projects.filter((project) =>
-           project.topics.includes(selectedTopic)
-         );
+  const [latestProject, setLatestProject] = useState<
+GalleryProps["projects"][0] | null
+  >(props.projects[0]);
+
+  const [selectedTopic, setSelectedTopic] = useState<string>("All");
+ 
+  // 追加
+  const handleTopicClick = (topic: string) => {
+    if (topic !== "All") {
+      setLatestProject(null);
+    } else {
+      //一覧表示の際には最新記事を目立たせる
+      setLatestProject(props.projects[0]);
+    }
+    setSelectedTopic(topic);
+  };
+ 
+  const filteredProjects =
+    selectedTopic === "All"
+      ? props.projects.slice(1)
+      : props.projects.filter((project) =>
+          project.topics.includes(selectedTopic)
+        );
  
   return (
     <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
       <div className="col-span-3 mx-auto">
         {/* GalleryTopics コンポーネント */}
+        <GalleryTopics
+          selectedTopic={selectedTopic}
+          handleTopicClick={handleTopicClick}
+        />
       </div>
- 
-      {/* 最新リリースのみ大きいカードで表示 */}
+
+
+      {/* && latestProjectが真値（truthy）の場合: 右側のJSX要素をレンダリング */}
       {latestProject && (
         <Link
           href={`/${latestProject.owner}/${latestProject.slug}`}
@@ -82,6 +104,9 @@ const Gallery = (props: GalleryProps) => {
           </Card>
         </Link>
       )}
+ 
+      {/* 追加 */}
+      {/* それ以外のリスト */}
       {filteredProjects.map((project) => (
         <Link
           key={project.repoName}
@@ -127,8 +152,6 @@ const Gallery = (props: GalleryProps) => {
           </Card>
         </Link>
       ))}
-
-
     </div>
   );
 };
